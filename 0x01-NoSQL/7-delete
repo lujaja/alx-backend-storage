@@ -1,3 +1,5 @@
 // Delete by match
 // db = connect("localhost:27017/");
-db.school.delete({ name: "Holberton school" });
+db.school.deleteMany(
+    {name: "Holberton school"}
+)
