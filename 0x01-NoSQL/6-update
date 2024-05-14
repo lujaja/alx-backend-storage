@@ -1,6 +1,6 @@
 // Update Document
 // db = connect("localhost:27017/");
-db.school.updateOne(
+db.school.update(
     { name: "Holberton school"},
     {
         $set: {
