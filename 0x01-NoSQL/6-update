@@ -1,11 +1,10 @@
 // Update Document
 // db = connect("localhost:27017/");
-db.school.update(
+db.school.updateMany(
     { name: "Holberton school"},
     {
         $set: {
             address: "505 Parnassus Ave"
         }
-    },
-    { multi: true}
+    }
 )
