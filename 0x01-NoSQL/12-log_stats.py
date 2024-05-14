@@ -12,9 +12,15 @@ total_logs = collection.count_documents({})
 
 methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 
-method_counts = {method: collection.count_documents({"method": method}) for method in methods}
+method_counts = {
+    method: collection.count_documents(
+        {"method": method}
+    ) for method in methods
+}
 
-status_check_count = collection.count_documents({"method": "GET", "path": "/status"})
+status_check_count = collection.count_documents(
+    {"method": "GET", "path": "/status"}
+)
 
 print(f"{total_logs} logs")
 print("Methods:")
