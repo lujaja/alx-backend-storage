@@ -1,3 +1,3 @@
 // All matches
-db = connect("localhost:27017/");
+// db = connect("localhost:27017/");
 db.school.aggregate( [ { $match : { name : "Holberton school" } } ] );
