@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Log stats - new version
+Log stats - New version
 """
 from pymongo import MongoClient
 
@@ -38,6 +38,6 @@ if __name__ == '__main__':
         print("\tmethod {}: {}".format(method, method_counts[method]))
     print("{} status check".format(status_check_count))
 
-    print("IPs")
+    print("IPs:")
     for ip in top_ips:
         print(f"\t{ip['_id']}: {ip['count']}")
