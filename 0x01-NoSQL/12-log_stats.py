@@ -26,8 +26,9 @@ if __name__ == '__main__':
         {"method": "GET", "path": "/status"}
     )
 
-    print(f"{total_logs} logs")
+    print("{} logs".format(total_logs))
     print("Methods:")
     for method in methods:
-        print(f"\tmethod {method}: {method_counts[method]}")
-    print(f"{status_check_count} status check")
+        print("\tmethod {}: {}".format(method, method_counts[method]))
+    print("{} status check".format(status_check_count))
+    client.close()
