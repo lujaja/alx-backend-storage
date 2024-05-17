@@ -1,33 +1,41 @@
+#!/usr/bin/env python3
+"""
+A module with tools for request caching and tracking.
+"""
+import redis
 import requests
-from cachetools import TTLCache, cached
 from functools import wraps
 
-# Initialize a cache with expiration time of 10 seconds
-cache = TTLCache(maxsize=100, ttl=10)
+r = redis.Redis()
 
-def get_page(url: str) -> str:
-    # Check if the URL is in the cache
-    if url in cache:
-        # If URL is in cache, return the cached content
-        return cache[url]
 
-    # If URL is not in cache, fetch the content using requests
-    response = requests.get(url)
-    content = response.text
-
-    # Store the content in the cache with the URL as key
-    cache[url] = content
-
-    return content
-
-def cache_decorator(func):
-    @wraps(func)
-    @cached(cache) # Use cachetools cached decorator to handle caching
+def url_access_count(method):
+    """Decorator for get_page function"""
+    @wraps(method)
     def wrapper(url):
-        return func(url)
+        """Wrapper function."""
+        key = "cached:" + url
+        cached_value = r.get(key)
+        if cached_value:
+            return cached_value.decode("utf-8")
+
+# Get new content and update cache
+        key_count = "count:" + url
+        html_content = method(url)
+
+        r.incr(key_count)
+        r.set(key, html_content, ex=10)
+        r.expire(key, 10)
+        return html_content
     return wrapper
 
-@cache_decorator
-def get_page_with_cache(url: str) -> str:
-    response = requests.get(url)
-    return response.text
+
+@url_access_count
+def get_page(url: str) -> str:
+    """Obtains HTML content of a particular."""
+    results = requests.get(url)
+    return results.text
+
+
+if __name__ == "__main__":
+    get_page('https://slowly.robertomurray.co.uk')
