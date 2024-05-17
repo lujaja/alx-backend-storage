@@ -14,7 +14,10 @@ class Cache:
     Attributes:
         _redis (Redis()): Redis client
     """
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        __init__ method
+        """
         self._redis = Redis()
         self._redis.flushdb()
 
@@ -25,6 +28,10 @@ class Cache:
         Attributes:
             data (str): data to store
         """
-        key: str = str(uuid4())
-        self._redis.set(key, data)
+        # Use Redis's PIPELINE feature to store data
+        # in a single write operation
+        key = str(uuid4())
+        pipeline = self._redis.pipeline()
+        pipeline.set(key, data)
+        pipeline.execute()
         return key
