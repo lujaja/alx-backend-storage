@@ -2,7 +2,7 @@
 """
 Writing strings to Redis
 """
-from redis import Redis
+import redis
 from uuid import uuid4
 from typing import Union
 
@@ -16,9 +16,9 @@ class Cache:
     """
     def __init__(self) -> None:
         """
-        __init__ method
+        Initialize Redis client
         """
-        self._redis = Redis()
+        self._redis = redis.Redis()
         self._redis.flushdb()
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
@@ -28,10 +28,8 @@ class Cache:
         Attributes:
             data (str): data to store
         """
-        # Use Redis's PIPELINE feature to store data
-        # in a single write operation
-        key = str(uuid4())
+        key: str = str(uuid4())
         pipeline = self._redis.pipeline()
         pipeline.set(key, data)
         pipeline.execute()
-        return key
+        return (key)
