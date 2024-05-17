@@ -8,6 +8,22 @@ from typing import Union, Callable, Optional
 from functools import wraps
 
 
+def replay(methoc: Callable) -> None:
+    """
+    replay method
+    """
+    r = redis.Redis()
+    name = methoc.__qualname__
+    inputs = r.lrange(f"{name}:inputs", 0, -1)
+    outputs = r.lrange(f"{name}:outputs", 0, -1)
+
+    print(f"{name} was called {len(inputs)} times.")
+    for i in range(len(inputs)):
+        inp = inputs[i].decode("utf-8")
+        out = outputs[i].decode("utf-8")
+        print(f"{name}(*{inp}) -> {out}")
+
+
 def count_calls(method: Callable) -> Callable:
     """
     Count calls decorator
