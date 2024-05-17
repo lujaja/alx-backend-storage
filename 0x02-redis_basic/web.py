@@ -39,6 +39,9 @@ def get_page(url: str) -> str:
     Returns:
         str: The HTML content of the URL.
     """
+    url = """
+    http://slowwly.robertomurray.co.uk/delay/3000/url/https://www.example.com
+    """
     cache_key = f"cached:{url}"
     cached_page = r.get(cache_key)
 
@@ -51,12 +54,3 @@ def get_page(url: str) -> str:
     r.setex(cache_key, 10, html_content)
 
     return html_content
-
-
-# Example usage
-if __name__ == "__main__":
-    url = """
-    http://slowwly.robertomurray.co.uk/delay/3000/url/https://www.example.com
-    """
-    print(get_page(url))  # Fetches the page and caches it
-    print(get_page(url))  # Retrieves the page from the cache
