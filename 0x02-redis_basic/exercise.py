@@ -26,9 +26,6 @@ def replay(method: Callable):
     for input, output in zip(inputs, outputs):
         print(f"{method.__qualname__}(*{input.decode('utf-8')}) -> {output.decode('utf-8')}")
 
-# Example usage
-if __name__ == "__main__":
-
 
 def count_calls(method: Callable) -> Callable:
     """
