@@ -4,7 +4,7 @@ Writing strings to Redis
 """
 import redis
 from uuid import uuid4
-from typing import Union
+from typing import Union, Callable, Optional
 
 
 class Cache:
@@ -33,3 +33,49 @@ class Cache:
         pipeline.set(key, data)
         pipeline.execute()
         return (key)
+
+    def get(
+            self,
+            key: str,
+            fn: Optional[Callable[[str], Union[str, bytes, int, float]]] = None
+    ) -> Optional[Union[str, bytes, int, float]]:
+        """
+        Retrieve data from Redis
+
+        Args:
+            key (str): Key to retrieve
+            fn (Optional[Callable[[str], Union[str, bytes, int, float]]],
+            optional): Function to apply to value if exists. Defaults to None.
+
+        Returns:
+            Optional[Union[str, bytes, int, float]]: Value stored at key or
+              None if key does not exist
+        """
+        value = self._redis.get(key)
+        if value is None:
+            return None
+        return (fn(value) if fn else value)
+
+    def get_str(self, key: str) -> Optional[str]:
+        """
+        Retrieve string from Redis
+
+        Args:
+            key (str): Key to retrieve
+
+        Returns:
+            Optional[str]: Value stored at key or None if key does not exist
+        """
+        return self.get(key, lambda x: x.decode("utf-8"))
+
+    def get_int(self, key: str) -> Optional[int]:
+        """
+        Retrieve integer from Redis
+
+        Args:
+            key (str): Key to retrieve
+
+        Returns:
+            Optional[int]: Value stored at key or None if key does not exist
+        """
+        return self.get(key, lambda x: int(x))
