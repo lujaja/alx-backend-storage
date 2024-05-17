@@ -8,20 +8,26 @@ from typing import Union, Callable, Optional
 from functools import wraps
 
 
-def replay(methoc: Callable) -> None:
+def replay(method: Callable):
     """
-    replay method
-    """
-    r = redis.Redis()
-    name = methoc.__qualname__
-    inputs = r.lrange(f"{name}:inputs", 0, -1)
-    outputs = r.lrange(f"{name}:outputs", 0, -1)
+    Display the history of calls of a particular function.
 
-    print(f"{name} was called {len(inputs)} times.")
-    for i in range(len(inputs)):
-        inp = inputs[i].decode("utf-8")
-        out = outputs[i].decode("utf-8")
-        print(f"{name}(*{inp}) -> {out}")
+    Args:
+        method (Callable): The function to replay the history for.
+    """
+    self = method.__self__
+    inputs_key = f"{method.__qualname__}:inputs"
+    outputs_key = f"{method.__qualname__}:outputs"
+
+    inputs = self._redis.lrange(inputs_key, 0, -1)
+    outputs = self._redis.lrange(outputs_key, 0, -1)
+
+    print(f"{method.__qualname__} was called {len(inputs)} times:")
+    for input, output in zip(inputs, outputs):
+        print(f"{method.__qualname__}(*{input.decode('utf-8')}) -> {output.decode('utf-8')}")
+
+# Example usage
+if __name__ == "__main__":
 
 
 def count_calls(method: Callable) -> Callable:
