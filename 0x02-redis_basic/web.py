@@ -1,56 +1,33 @@
-#!/usr/bin/env python3
-"""
-Web Caching
-"""
 import requests
-import redis
-from typing import Callable
+from cachetools import TTLCache, cached
+from functools import wraps
 
-r = redis.Redis()
+# Initialize a cache with expiration time of 10 seconds
+cache = TTLCache(maxsize=100, ttl=10)
 
+def get_page(url: str) -> str:
+    # Check if the URL is in the cache
+    if url in cache:
+        # If URL is in cache, return the cached content
+        return cache[url]
 
-def count_calls(method: Callable) -> Callable:
-    """
-    A decorator that counts the number of times a method is called.
+    # If URL is not in cache, fetch the content using requests
+    response = requests.get(url)
+    content = response.text
 
-    Args:
-        method (Callable): The method to be decorated.
+    # Store the content in the cache with the URL as key
+    cache[url] = content
 
-    Returns:
-        Callable: The wrapped method.
-    """
-    def wrapper(*args, **kwargs):
-        key = f"count:{args[0]}"
-        r.incr(key)
-        return method(*args, **kwargs)
+    return content
 
+def cache_decorator(func):
+    @wraps(func)
+    @cached(cache) # Use cachetools cached decorator to handle caching
+    def wrapper(url):
+        return func(url)
     return wrapper
 
-
-@count_calls
-def get_page(url: str) -> str:
-    """
-    Fetch the HTML content of the given URL and cache it
-     in Redis with an expiration time.
-
-    Args:
-        url (str): The URL to fetch.
-
-    Returns:
-        str: The HTML content of the URL.
-    """
-    url = """
-    http://slowwly.robertomurray.co.uk/delay/3000/url/https://www.example.com
-    """
-    cache_key = f"cached:{url}"
-    cached_page = r.get(cache_key)
-
-    if cached_page:
-        return cached_page.decode('utf-8')
-
+@cache_decorator
+def get_page_with_cache(url: str) -> str:
     response = requests.get(url)
-    html_content = response.text
-
-    r.setex(cache_key, 10, html_content)
-
-    return html_content
+    return response.text
