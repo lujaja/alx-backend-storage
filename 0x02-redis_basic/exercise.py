@@ -24,7 +24,10 @@ def replay(method: Callable):
 
     print(f"{method.__qualname__} was called {len(inputs)} times:")
     for input, output in zip(inputs, outputs):
-        print(f"{method.__qualname__}(*{input.decode('utf-8')}) -> {output.decode('utf-8')}")
+        print(
+            f"{method.__qualname__}(*{input.decode('utf-8')}) -> "
+            f"{output.decode('utf-8')}"
+        )
 
 
 def count_calls(method: Callable) -> Callable:
